@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>สั่งอาหารอลาคาร์ท</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; color:#333; }
+.container { display:flex; flex-wrap:wrap; max-width:1200px; margin:20px auto; gap:20px; }
+
+/* ================== Slider ================== */
+.slider-container {
+    flex:1; 
+    min-width:300px; 
+    max-width:600px; 
+    position: relative; 
+    overflow: hidden; 
+    border-radius: 10px;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    padding: 10px 0; 
+    background: #fff;
+    box-shadow:0 2px 4px rgba(0,0,0,0.1); 
+    
+}
+
+.slides { display: flex; transition: transform 0.5s ease-in-out; width:100%; }
+.slide { min-width: 100%; box-sizing: border-box; display:flex; align-items:center; justify-content:center; }
+.slide img { width:auto; height:auto; max-width:100%; max-height:100%; display:block; object-fit:contain; border-radius:10px; }
+.slider-buttons { position: absolute; top: 50%; width:100%; display:flex; justify-content:space-between; transform: translateY(-50%); }
+.slider-buttons button { background: rgba(0,0,0,0.5); border:none; color:white; font-size:2em; padding:0 12px; cursor:pointer; border-radius:50%; }
+/* ================== เมนู ================== */
+.menu-form { flex:1; min-width:300px; background:#fff; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+h2 { color:#007bff; margin-top:0; }
+.tabs { display:flex; overflow-x:auto; margin-bottom:10px; border-bottom:2px solid #ccc; }
+.tab-button { padding:8px 15px; cursor:pointer; background:#eee; border:none; margin-right:5px; border-radius:5px 5px 0 0; font-weight:bold; }
+.tab-button.active { background:#007bff; color:#fff; }
+.tab-content { display:none; padding-top:10px; }
+.tab-content.active { display:block; }
+
+.menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:10px; }
+.menu-item { border:1px solid #ddd; border-radius:8px; padding:8px; cursor:pointer; text-align:center; position:relative; transition:0.2s; }
+.menu-item.selected { border:2px solid #28a745; box-shadow:0 0 10px rgba(40,167,69,0.5); }
+.selected-icon { position:absolute; top:5px; right:5px; background:#28a745; color:white; border-radius:50%; width:24px; height:24px; line-height:24px; font-weight:bold; display:none; }
+.menu-item.selected .selected-icon { display:block; }
+
+#summary { margin-top:20px; padding:10px; background:#e9ecef; border-radius:4px; }
+button#submit-order { width:100%; padding:15px; margin-top:15px; background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:1.1em; }
+button#submit-order:hover { background:#218838; }
+button#back { margin-bottom:15px; background:#007bff; color:#fff; padding:10px 15px; border:none; border-radius:4px; cursor:pointer; }
+button#back:hover { background:#0056b3; }
+label { display:block; margin-top:10px; font-weight:bold; }
+input[type="text"], input[type="number"], input[type="time"], select { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+.alert-message { background-color: #ffc107; color: #333; padding: 10px; border-radius: 4px; margin-top: 10px; font-weight: bold; text-align: center; display: none; }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="slider-container">
+  <div class="slides">
+    <div class="slide"><img src="toast.png"></div>
+            <div class="slide"><img src="appetizer.png"></div>
+            <div class="slide"><img src="toast.png"></div>
+            <div class="slide"><img src="toast1.png"></div>
+            <div class="slide"><img src="pancake.png"></div>
+            <div class="slide"><img src="pasta.png"></div>
+            <div class="slide"><img src="comfortingfood.png"></div>
+            <div class="slide"><img src="comfortingfood1.png"></div>
+            <div class="slide"><img src="sarad.png"></div>
+    
+  </div>
+  <div class="slider-buttons">
+    <button id="prev">&#10094;</button>
+    <button id="next">&#10095;</button>
+  </div>
+</div>
+
+    <div class="menu-form">
+        <button id="back" onclick="window.location.href='index.html'">🔙 กลับ</button>
+        <h2>รายละเอียดคำสั่งซื้อ</h2>
+        <form id="order-form">
+            <label for="roomNo">เลขห้องพัก:</label>
+            <input type="text" id="roomNo" required pattern="[A-Za-z0-9]+" placeholder="เช่น 101">
+            <label for="pax">จำนวนท่าน:</label>
+            <input type="number" id="pax" min="1" value="1" required>
+            <label for="serviceType">วิธีรับอาหาร:</label>
+            <select id="serviceType" required>
+                <option value="Dine-in">ทานที่ร้าน</option>
+                <option value="Room-service">Room service</option>
+            </select>
+            <label for="time">เวลาที่จะลง/ให้ไปส่ง:</label>
+
+
+            
+            <input type="time" id="time" value="09:00" required>
+            <label for="note">หมายเหตุเพิ่มเติม:</label>
+<textarea id="note" placeholder="ใส่คำสั่งพิเศษ เช่น ไม่ใส่พริก, ขอร้อน ๆ" rows="3" style="width:100%; padding:8px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box;"></textarea>
+
+            <div id="room-service-alert" class="alert-message">⚠️ Room service บริการได้ 9 โมงเช้าเป็นต้นไป</div>
+        </form>
+
+        <h2>เมนูอาหาร</h2>
+        <div class="tabs" id="menu-tabs"></div>
+        <div id="menu-container"></div>
+
+        <div id="summary">
+            <h3>สรุปรายการที่เลือก:</h3>
+            <ul id="selected-menu-list"><li>ยังไม่ได้เลือกเมนู</li></ul>
+        </div>
+        <button id="submit-order">ยืนยันคำสั่งซื้อ</button>
+    </div>
+</div>
+
+<script>
+// ================== Data ==================
+const WEB_APP_URL='https://script.google.com/macros/s/AKfycbwkc_zR9a7DH-7SoI9BYuB1FoMPT0oyB_ZIURc30b0emOfuYcv5d0I5vqYSwWTd9KyZ/exec';
+const ROOM_SERVICE_START_TIME='09:00';
+let selectedMenu=[];
+
+const MENU_DATA=[
+    { category:'PANKCAKE', type:'Breakfast', items:['Homemade Pancakes','Blubery & Buttermilk Pancake with lemon curd'] },
+    { category:'PASTA', type:'Breakfast', items:['Spaghetti Bologness(สปาเก็ตตี้ซอสเนื้อ)',
+    'Spaghetti Cabonara(สปาเก้ตตี้คาโบนารา)',
+    'Spaghetti aglio olio e peperoncino (สปาเก็ตตี้ผัดพริกกระเทียมเบคอนกรอล)',
+    'Spaghetti Black Ink with Grilled Prawns(สปาเก็ตตี้กุ้งผัดซอสหมึกดำ)',
+  ] },
+    { category:'TOAST', type:'Breakfast', items:[
+        'chicken satay on toast',
+    'Shrimp cocktail on toast',
+    'ABF on toast (American Breakfast)',
+    'Grilled chicken and Guacamole on toast',
+    'Wella da toast',
+    'Avocado and scrambled eggs on toast',
+    'F.A.T. on toast',
+    'Popeye on toast'] },
+    { category:'SALAD MENU', type:'Breakfast', items:['GRILLED ZUCCHINI WITH TOMATOES SALSA',
+    'CAESAR SALAD ',
+    'AVOCADO QUINOA AND GRILLED CHICKEN BREAST SALAD',
+   ] },
+    { category:'APPETIZER', type:'Alacarte', items:['ไก่สะเต๊ะ(Wella da Chicken Satay)',
+    'มอสซาเรลล่าชีสทอด (Deep Fried Mozzarella Cheese Sticks)',
+    'เฟรนซ์ฟราย (French fries)',
+    'เกี๊ยวซ่า (Gyoza)',
+    'เนื้อย่างจิ้มแจ่ว (Beef steak with Spicy Tamarind Sauce)',
+    'เนื้อย่างหม่าล่า (Grilled Mala Beef skewers)',
+    ] }
+    ,
+    { category:'COMFORTING FOOD', type:'Breakfast', items:[
+        'โจ๊กเวลาดา (Wellada Congee)',
+    'ข้าวไข่ข้นกุ้งกระเทียม (Stir Fried Shrimp with garlic, pepper and Scrambled Egg on Rice)',
+    'ข้าวหน้าเนื้อสไลด์โอซาก้า (Steakidon - Steak Rice Bowl Osaka Style)',
+    'ราดหน้าหมูหมักเส้นกรอบ (Crispy Rice Noodle with Pork and Gravy)',
+    'Wella da toast',
+    'Avocado and scrambled eggs on toast',
+    'F.A.T. on toast',
+    'Popeye on toast',
+    'ข้าวซอยแห้งไก่',
+    'ข้าวซอยไก่',
+    'ผัดไทยกุ้ง',
+    'ข้าวผัดหนำเลี๊ยบ',
+    'ข้าวหมูกรอบคั่วพริกเกลือ + ไข่ดาว',
+    'ข้าวต้มแห้ง'] },
+    { category:' MENU', type:'Breakfast', items:
+    ['ก๋วยเตี๋ยวคั่วไก่',
+    'ข้าวผัดไก่ + ไข่ดาว',
+    'ข้าวผัดหมู + ไข่ดาว',
+    'ข้าวผัดกุ้ง + ไข่ดาว',
+    'ข้าวกระเพราเนื้อ + ไข่ดาว',
+    'ข้าวกระเพราหมู + ไข่ดาว',
+    'ข้าวกระเพราไก่ + ไข่ดาว',
+    'ข้าวไก่หมูกระเทียม + ไข่ดาว',
+    'ข้าวหมูกระเทียม + ไข่ดาว',
+   ] },
+];
+
+// ================== Render Tabs ==================
+const tabsContainer=document.getElementById('menu-tabs');
+const menuContainer=document.getElementById('menu-container');
+let currentTab=0;
+
+MENU_DATA.forEach((menu,index)=>{
+    const btn=document.createElement('button');
+    btn.className='tab-button '+(index===0?'active':'');
+    btn.textContent=menu.category;
+    btn.dataset.index=index;
+    btn.addEventListener('click',()=>switchTab(index));
+    tabsContainer.appendChild(btn);
+});
+
+function switchTab(index){
+    currentTab=index;
+    document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+    document.querySelector(`.tab-button[data-index="${index}"]`).classList.add('active');
+    renderMenuContent();
+}
+
+function renderMenuContent(){
+    menuContainer.innerHTML='';
+    const menu=MENU_DATA[currentTab];
+    const contentDiv=document.createElement('div');
+    contentDiv.className='tab-content active';
+
+    const grid=document.createElement('div');
+    grid.className='menu-grid';
+
+    menu.items.forEach(item=>{
+        const div=document.createElement('div');
+        div.className='menu-item';
+        div.dataset.name=item;
+
+        // ตรวจสอบว่ามีใน selectedMenu
+        const existing = selectedMenu.find(i => i.name === item);
+        const qty = existing ? existing.qty : 0;
+
+        div.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+        <span>${item}</span>
+        <button type="button" class="decrease-btn">➖</button>
+    </div>
+    <div class="selected-icon">x${selectedMenu[item] ? selectedMenu[item].qty : 0}</div>
+`;
+
+div.querySelector('.decrease-btn').addEventListener('click', e=>{
+    e.stopPropagation(); // ป้องกันคลิก select
+    decreaseQty(item);
+});
+
+        // คลิกบนเมนูเพิ่มจำนวน
+        div.addEventListener('click', (e)=>{
+            if(e.target.classList.contains('decrease-btn')) return; // ข้ามถ้าเป็นปุ่มลด
+            addMenuItem(item, div);
+        });
+
+        // ปุ่มลดจำนวน
+        div.querySelector('.decrease-btn').addEventListener('click',(e)=>{
+            e.stopPropagation();
+            decreaseMenuItem(item, div);
+        });
+
+        if(qty>0) div.classList.add('selected');
+
+        grid.appendChild(div);
+    });
+
+    contentDiv.appendChild(grid);
+    menuContainer.appendChild(contentDiv);
+}
+function checkRoomServiceTime(){
+    const serviceType = document.getElementById('serviceType').value;
+    const time = document.getElementById('time').value; // ตัวอย่าง: "08:30"
+    const alertDiv = document.getElementById('room-service-alert');
+
+    if(serviceType === 'Room-service' && (time < '09:00' || time > '18:00')) {
+        alertDiv.style.display = 'block';
+    } else {
+        alertDiv.style.display = 'none';
+    }
+}
+
+function addMenuItem(name, div){
+    let existing = selectedMenu.find(i=>i.name===name);
+    if(existing) existing.qty +=1;
+    else selectedMenu.push({name:name, qty:1});
+    div.classList.add('selected');
+    div.querySelector('.selected-icon').textContent=`x${selectedMenu.find(i=>i.name===name).qty}`;
+    updateSummary();
+}
+
+function toggleMenuItem(event) {
+    const div = event.currentTarget;
+    const name = div.dataset.name;
+
+    const existing = selectedMenu.find(item => item.name === name);
+    if (existing) {
+        existing.qty += 1; // เพิ่มจำนวน
+    } else {
+        selectedMenu.push({ name: name, qty: 1 });
+    }
+
+    updateSummary();
+}
+
+function decreaseMenuItem(name, div){
+    let existing = selectedMenu.find(i=>i.name===name);
+    if(!existing) return;
+    existing.qty -=1;
+    if(existing.qty<=0){
+        selectedMenu = selectedMenu.filter(i=>i.name!==name);
+        div.classList.remove('selected');
+        div.querySelector('.selected-icon').textContent='x0';
+    } else {
+        div.querySelector('.selected-icon').textContent=`x${existing.qty}`;
+    }
+    updateSummary();
+}
+
+function updateSummary(){
+    const list=document.getElementById('selected-menu-list');
+    list.innerHTML='';
+    if(selectedMenu.length===0){
+        const li=document.createElement('li');
+        li.textContent='ยังไม่ได้เลือกเมนู';
+        list.appendChild(li);
+        return;
+    }
+    selectedMenu.forEach(item=>{
+        const li=document.createElement('li');
+        li.textContent=`${item.name} x${item.qty}`;
+        list.appendChild(li);
+    });
+}
+
+
+
+// ================== Room Service ==================
+document.getElementById('serviceType').addEventListener('change', checkRoomServiceTime);
+document.getElementById('time').addEventListener('change', checkRoomServiceTime);
+
+function checkRoomServiceTime() {
+    const serviceType = document.getElementById('serviceType').value;
+    const time = document.getElementById('time').value; // "HH:MM"
+    const alertDiv = document.getElementById('room-service-alert');
+
+    if (serviceType === 'Room-service' && (time < '09:00' || time > '17:00')) {
+        alertDiv.style.display = 'block'; // แสดงแจ้งเตือน
+    } else {
+        alertDiv.style.display = 'none'; // ซ่อนแจ้งเตือน
+    }
+}
+
+
+
+document.getElementById('next').addEventListener('click',()=>{
+  sliderIndex=(sliderIndex+1)%slideCount;
+  slidesEl.style.transform=`translateX(-${sliderIndex*100}%)`;
+});
+
+document.getElementById('prev').addEventListener('click',()=>{
+  sliderIndex=(sliderIndex-1+slideCount)%slideCount;
+  slidesEl.style.transform=`translateX(-${sliderIndex*100}%)`;
+});
+
+// ================== Submit ==================
+document.getElementById('submit-order').addEventListener('click', async () => {
+    const form = document.getElementById('order-form');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (selectedMenu.length === 0) { 
+    alert('กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการ'); 
+    return; 
+}
+
+
+    const roomNo = document.getElementById('roomNo').value;
+    const pax = document.getElementById('pax').value;
+    const serviceType = document.getElementById('serviceType').value;
+    let time = document.getElementById('time').value;
+    if (serviceType === 'Room-service' && time < ROOM_SERVICE_START_TIME) time = ROOM_SERVICE_START_TIME;
+    const note = document.getElementById('note').value;
+
+const orderItems = Object.values(selectedMenu).map(item => `• ${item.name} x${item.qty}`).join('\n');
+
+
+    const orderData = {
+        roomNo,
+        pax,
+        serviceType,
+        time,
+        selectedMenu: orderItems, // array ของชื่อเมนู
+        note
+    };
+
+    document.getElementById('submit-order').textContent = 'กำลังส่ง...';
+    document.getElementById('submit-order').disabled = true;
+
+    try {
+        const res = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(orderData)
+        });
+        const result = await res.json();
+        if (result.success) {
+            alert('✅ สั่งอาหารสำเร็จ!');
+            form.reset();
+            selectedMenu = [];
+            renderMenuContent();
+            updateSummary();
+        } else alert('❌ เกิดข้อผิดพลาด: ' + result.message);
+    } catch (e) {
+        console.error(e);
+        alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ');
+    } finally {
+        document.getElementById('submit-order').textContent = 'ยืนยันคำสั่งซื้อ';
+        document.getElementById('submit-order').disabled = false;
+    }
+});
+
+// ================== Slider ==================
+const slidesEl=document.querySelector('.slides');
+const slides = document.querySelectorAll('.slide'); // <--- แก้ตรงนี้
+const slideCount=slides.length;
+let sliderIndex=0;
+
+
+// เริ่มต้น render
+renderMenuContent();
+</script>
+</body>
+</html>

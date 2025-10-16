@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เลือกหมวดหมู่เมนู</title>
+<link href="https://fonts.googleapis.com/css2?family=Anantason&display=swap" rel="stylesheet">
+
+<style>
+/* ========== Reset & Base ========== */
+body {
+    font-family: 'Anantason', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #e0f7fa, #ffffff);
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    background: #ffffff;
+    padding: 40px 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* ========== Logo ========== */
+.logo {
+    width: 120px;
+    height: auto;
+    margin: 0 auto 30px;
+    display: block;
+    border-radius: 50%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* ========== Title ========== */
+h1 {
+    color: #007bff;
+    margin-bottom: 40px;
+    font-size: 1.8em;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+/* ========== Category Buttons ========== */
+.category-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+.category-btn {
+    padding: 20px;
+    font-size: 1.2em;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: linear-gradient(90deg, #007bff, #00b0ff);
+    color: #fff;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+.category-btn:hover {
+    background: linear-gradient(90deg, #0056b3, #0093d1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Logo -->
+    <img src="Logo_Welladee-01.jpg" alt="Logo Welladee" class="logo">
+
+    <h1>เลือกหมวดหมู่เมนู</h1>
+
+    <div class="category-grid">
+        <button class="category-btn" onclick="window.location.href='breakfast.html'">🍳 อาหารเช้า</button>
+        <button class="category-btn" onclick="window.location.href='alacart.html'">🥘 อลาคาร์ท</button>
+    </div>
+</div>
+</body>
+</html>
