@@ -3,219 +3,322 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>สั่งอาหาร</title>
+<title>สั่งอาหารเช้า</title>
 <style>
 body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f4f4f9; color:#333; }
 .container { display:flex; flex-wrap:wrap; max-width:1200px; margin:20px auto; gap:20px; }
-.slider { flex:1; min-width:300px; border-radius:8px; overflow:hidden; }
-.slider img { width:100%; display:none; border-radius:8px; }
-.slider img.active { display:block; }
-.menu-form { flex:1; min-width:300px; background:#fff; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1); }
+
+/* Slider */
+.slider-container { flex:1; min-width:300px; max-width:600px; position: relative; overflow: hidden; border-radius: 10px; display:flex; align-items:center; justify-content:center; padding:10px 0; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+.slides { display:flex; transition: transform 0.5s ease-in-out; width:100%; }
+.slide { min-width:100%; box-sizing:border-box; display:flex; align-items:center; justify-content:center; }
+.slide img { width:auto; height:auto; max-width:100%; max-height:100%; display:block; object-fit:contain; border-radius:10px; }
+.slider-buttons { position:absolute; top:50%; width:100%; display:flex; justify-content:space-between; transform:translateY(-50%); }
+.slider-buttons button { background: rgba(0,0,0,0.5); border:none; color:white; font-size:2em; padding:0 12px; cursor:pointer; border-radius:50%; }
+
+/* Menu */
+.menu-form { flex:1; min-width:300px; background:#fff; padding:15px; border-radius:8px; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
 h2 { color:#007bff; margin-top:0; }
+.tabs { display:flex; overflow-x:auto; margin-bottom:10px; border-bottom:2px solid #ccc; }
+.tab-button { padding:8px 15px; cursor:pointer; background:#eee; border:none; margin-right:5px; border-radius:5px 5px 0 0; font-weight:bold; }
+.tab-button.active { background:#007bff; color:#fff; }
 .menu-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin-top:10px; }
 .menu-item { border:1px solid #ddd; border-radius:8px; padding:8px; cursor:pointer; text-align:center; position:relative; transition:0.2s; }
 .menu-item.selected { border:2px solid #28a745; box-shadow:0 0 10px rgba(40,167,69,0.5); }
 .selected-icon { position:absolute; top:5px; right:5px; background:#28a745; color:white; border-radius:50%; width:24px; height:24px; line-height:24px; font-weight:bold; display:none; }
 .menu-item.selected .selected-icon { display:block; }
+
 #summary { margin-top:20px; padding:10px; background:#e9ecef; border-radius:4px; }
 button#submit-order { width:100%; padding:15px; margin-top:15px; background:#28a745; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:1.1em; }
 button#submit-order:hover { background:#218838; }
 button#back { margin-bottom:15px; background:#007bff; color:#fff; padding:10px 15px; border:none; border-radius:4px; cursor:pointer; }
 button#back:hover { background:#0056b3; }
 label { display:block; margin-top:10px; font-weight:bold; }
-input[type="text"], input[type="number"], input[type="time"], select { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
-.alert-message { background-color: #ffc107; color: #333; padding: 10px; border-radius: 4px; margin-top: 10px; font-weight: bold; text-align: center; display: none; }
+input[type="text"], input[type="number"], input[type="time"], select, textarea { width:100%; padding:8px; margin-top:5px; border:1px solid #ccc; border-radius:4px; box-sizing:border-box; }
+.alert-message { background-color:#ffc107; color:#333; padding:10px; border-radius:4px; margin-top:10px; font-weight:bold; text-align:center; display:none; }
 </style>
+<!-- เพิ่มด้านบน <head> -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body>
 <div class="container">
-    <div class="slider" id="slider">
-        <img src="food1.jpg" class="active">
-        <img src="food2.jpg">
-        <img src="food3.jpg">
+
+<!-- Slider -->
+<div class="slider-container">
+    <div class="slides">
+        <div class="slide"><img src="breakfast.png"></div>
+       
     </div>
-
-    <div class="menu-form">
-        <button id="back" onclick="window.history.back()">🔙 กลับ</button>
-        <h2>รายละเอียดคำสั่งซื้อ</h2>
-        <form id="order-form">
-            <label for="roomNo">เลขห้องพัก:</label>
-            <input type="text" id="roomNo" required pattern="[A-Za-z0-9]+" placeholder="เช่น 101">
-            <label for="pax">จำนวนท่าน:</label>
-            <input type="number" id="pax" min="1" value="1" required>
-            <label for="serviceType">วิธีรับอาหาร:</label>
-            <select id="serviceType" required>
-                <option value="Dine-in">ทานที่ร้าน</option>
-                <option value="Room-service">Room service</option>
-            </select>
-            <label for="time">เวลาที่จะลง/ให้ไปส่ง:</label>
-            <input type="time" id="time" value="09:00" required>
-            <div id="room-service-alert" class="alert-message">⚠️ Room service บริการได้ 9 โมงเช้าเป็นต้นไป</div>
-        </form>
-
-        <h2>เมนูอาหาร</h2>
-        <div id="menu-container" class="menu-grid"></div>
-
-        <div id="summary">
-            <h3>สรุปรายการที่เลือก:</h3>
-            <ul id="selected-menu-list">
-                <li>ยังไม่ได้เลือกเมนู</li>
-            </ul>
-        </div>
-        <button id="submit-order">ยืนยันคำสั่งซื้อ</button>
+    <div class="slider-buttons">
+        <button id="prev">&#10094;</button>
+        <button id="next">&#10095;</button>
     </div>
 </div>
 
+<!-- Menu Form -->
+<div class="menu-form">
+    <button id="back" onclick="window.location.href='index.html'">🔙 กลับ</button>
+    <h2>รายละเอียดคำสั่งซื้อ</h2>
+    <form id="order-form">
+        <label>เลขห้องพัก:</label>
+        <input type="text" id="roomNo" required placeholder="เช่น 101">
+        <label>จำนวนท่าน:</label>
+        <input type="number" id="pax" min="1" value="1" required>
+        <label>วิธีรับอาหาร:</label>
+        <select id="serviceType" required>
+            <option value="Dine-in">ทานที่ร้าน</option>
+            <option value="Room-service">Room service</option>
+        </select>
+        <label>เวลาที่จะลง/ให้ไปส่ง:</label>
+        <input type="time" id="time" value="09:00" required>
+        <label>หมายเหตุเพิ่มเติม:</label>
+        <textarea id="note" rows="3" placeholder="เช่น ไม่ใส่พริก, ขอร้อน ๆ"></textarea>
+        <div id="room-service-alert" class="alert-message">⚠️ Room service บริการได้ 9 โมงเช้าเป็นต้นไป</div>
+    </form>
+
+    <h2>เมนูอาหารเช้า</h2>
+    <div class="tabs" id="menu-tabs"></div>
+    <div id="menu-container"></div>
+
+    <div id="summary">
+        <h3>สรุปรายการที่เลือก:</h3>
+        <ul id="selected-menu-list"><li>ยังไม่ได้เลือกเมนู</li></ul>
+    </div>
+    <button id="submit-order">ยืนยันคำสั่งซื้อ</button>
+</div>
+</div>
+
 <script>
-const WEB_APP_URL = 'YOUR_WEB_APP_URL'; // เปลี่ยนเป็น URL ของคุณ
-const BREAKFAST_START_TIME='07:00';
-const BREAKFAST_END_TIME='10:30';
-const ROOM_SERVICE_START_TIME='09:00';
+// ================== Config ==================
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwkc_zR9a7DH-7SoI9BYuB1FoMPT0oyB_ZIURc30b0emOfuYcv5d0I5vqYSwWTd9KyZ/exec'; // ใช้ Web App เดียวกับ Alacarte
+const ROOM_SERVICE_START_TIME = '09:00';
+let selectedMenu = [];
 
-let selectedMenu={};
-
-const selectedCategory = localStorage.getItem('selectedCategory') || 'Breakfast';
-
-const MENU_DATA=[
-    { category:'อาหารเช้า', type:'Breakfast', items:['ไข่กระทะ','โจ๊กหมู','ข้าวต้มกุ้ง','อเมริกันเบรคฟาสต์','แพนเค้ก','ขนมปังฝรั่งเศส','ผลไม้รวม'] },
-    { category:'อลาคาร์ท', type:'Alacarte', items:['ผัดกะเพราไก่','ต้มยำกุ้งน้ำข้น','แกงเขียวหวานเนื้อ','ข้าวผัดสับปะรด','ส้มตำไทย','คอหมูย่าง','ผัดไทยกุ้งสด'] }
+// ================== Data ==================
+const MENU_DATA = [
+    { category:'BREAKFAST', items:['ไข่ ออมเล็ต (Wakey Wakey wellada Omelette)',
+        'โจ๊กหมู เวลาดา (Traditional Thai Breakfast)',
+        'แซนวิช (Good morning Sandwich)',
+        'ข้าวผัด อรุณสวัสดิ์ (Arun sawat fried rice)',
+        'แพนเค้ก (Rise and shine pancakes )'
+    ] },
+    { category:'DRINK', items:['นมร้อน(Hot milk)','กาแฟร้อน (Hot Cafe)','ชาร้อน(Hot Tea)'] },
+    { category:'FRUIT', items:['ผลไม้รวม','สลัดผัก'] }
 ];
 
-const menuContainer=document.getElementById('menu-container');
+// ================== Render Tabs ==================
+const tabsContainer = document.getElementById('menu-tabs');
+const menuContainer = document.getElementById('menu-container');
+let currentTab = 0;
 
-MENU_DATA.filter(m=>m.type===selectedCategory).forEach(menu=>{
-    menu.items.forEach((item,index)=>{
-        const div=document.createElement('div');
-        div.className='menu-item';
-        div.setAttribute('data-name',item);
-        div.setAttribute('data-category',menu.category);
-        div.setAttribute('data-type',menu.type);
-        div.innerHTML=`<div>${item}</div><div class="selected-icon">✓</div>`;
-        div.addEventListener('click',toggleMenuItem);
-        menuContainer.appendChild(div);
-    });
+MENU_DATA.forEach((menu,index)=>{
+    const btn = document.createElement('button');
+    btn.className = 'tab-button '+(index===0?'active':'');
+    btn.textContent = menu.category;
+    btn.dataset.index = index;
+    btn.addEventListener('click',()=>switchTab(index));
+    tabsContainer.appendChild(btn);
 });
 
-function toggleMenuItem(event){
-    const div=event.currentTarget;
-    const key=div.getAttribute('data-name');
-    if(selectedMenu[key]){
-        delete selectedMenu[key];
-        div.classList.remove('selected');
-    } else {
-        if(div.getAttribute('data-type')==='Breakfast'&&!isBreakfastTimeValid()){
-            alert(`เมนู ${key} เป็นอาหารเช้า สามารถสั่งได้ช่วง ${BREAKFAST_START_TIME}-${BREAKFAST_END_TIME}`);
-            return;
-        }
-        selectedMenu[key]={
-            name:key,
-            category:div.getAttribute('data-category'),
-            type:div.getAttribute('data-type')
-        };
-        div.classList.add('selected');
-    }
+function switchTab(index){
+    currentTab=index;
+    document.querySelectorAll('.tab-button').forEach(b=>b.classList.remove('active'));
+    document.querySelector(`.tab-button[data-index="${index}"]`).classList.add('active');
+    renderMenuContent();
+}
+
+function renderMenuContent(){
+    menuContainer.innerHTML='';
+    const menu = MENU_DATA[currentTab];
+    const grid = document.createElement('div');
+    grid.className='menu-grid';
+
+    menu.items.forEach(item=>{
+        const div = document.createElement('div');
+        div.className='menu-item';
+        div.dataset.name = item;
+        const existing = selectedMenu.find(i=>i.name===item);
+        const qty = existing ? existing.qty : 0;
+
+        div.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span>${item}</span>
+                <button type="button" class="decrease-btn">➖</button>
+            </div>
+            <div class="selected-icon">x${qty}</div>
+        `;
+
+        // เพิ่มจำนวน
+        div.addEventListener('click', (e)=>{
+            if(e.target.classList.contains('decrease-btn')) return;
+            addMenuItem(item, div);
+        });
+
+        // ลดจำนวน
+        div.querySelector('.decrease-btn').addEventListener('click', e=>{
+            e.stopPropagation();
+            decreaseMenuItem(item, div);
+        });
+
+        if(qty>0) div.classList.add('selected');
+        grid.appendChild(div);
+    });
+
+    menuContainer.appendChild(grid);
+}
+
+// ================== Menu Functions ==================
+function addMenuItem(name, div){
+    let existing = selectedMenu.find(i=>i.name===name);
+    if(existing) existing.qty+=1;
+    else selectedMenu.push({name, qty:1});
+    div.classList.add('selected');
+    div.querySelector('.selected-icon').textContent=`x${selectedMenu.find(i=>i.name===name).qty}`;
     updateSummary();
 }
 
-function isBreakfastTimeValid(){
-    const now=new Date();
-    const nowMinutes=now.getHours()*60+now.getMinutes();
-    const [sh,sm]=BREAKFAST_START_TIME.split(':').map(Number);
-    const [eh,em]=BREAKFAST_END_TIME.split(':').map(Number);
-    const startMinutes=sh*60+sm;
-    const endMinutes=eh*60+em;
-    return nowMinutes>=startMinutes && nowMinutes<=endMinutes;
+function decreaseMenuItem(name, div){
+    let existing = selectedMenu.find(i=>i.name===name);
+    if(!existing) return;
+    existing.qty-=1;
+    if(existing.qty<=0){
+        selectedMenu = selectedMenu.filter(i=>i.name!==name);
+        div.classList.remove('selected');
+        div.querySelector('.selected-icon').textContent='x0';
+    } else {
+        div.querySelector('.selected-icon').textContent=`x${existing.qty}`;
+    }
+    updateSummary();
 }
 
 function updateSummary(){
     const list=document.getElementById('selected-menu-list');
     list.innerHTML='';
-    if(Object.keys(selectedMenu).length===0){
+    if(selectedMenu.length===0){
         list.innerHTML='<li>ยังไม่ได้เลือกเมนู</li>';
         return;
     }
-    for(const key in selectedMenu){
-        const item=selectedMenu[key];
+    selectedMenu.forEach(item=>{
         const li=document.createElement('li');
-        li.textContent=`${item.name} (${item.category} / ${item.type})`;
+        li.textContent=`${item.name} x${item.qty}`;
         list.appendChild(li);
-    }
+    });
 }
 
-document.getElementById('serviceType').addEventListener('change',checkRoomServiceTime);
-document.getElementById('time').addEventListener('change',checkRoomServiceTime);
+// ================== Room Service ==================
+document.getElementById('serviceType').addEventListener('change', checkRoomServiceTime);
+document.getElementById('time').addEventListener('change', checkRoomServiceTime);
 
 function checkRoomServiceTime(){
-    const serviceType=document.getElementById('serviceType').value;
-    const time=document.getElementById('time').value;
-    const alertDiv=document.getElementById('room-service-alert');
-    if(serviceType==='Room-service'&&time<ROOM_SERVICE_START_TIME){
+    const serviceType = document.getElementById('serviceType').value;
+    const time = document.getElementById('time').value;
+    const alertDiv = document.getElementById('room-service-alert');
+    if(serviceType==='Room-service' && time < ROOM_SERVICE_START_TIME){
         alertDiv.style.display='block';
-    } else {
-        alertDiv.style.display='none';
-    }
+    } else alertDiv.style.display='none';
 }
 
-document.getElementById('submit-order').addEventListener('click',submitOrder);
-
-async function submitOrder(){
-    const form=document.getElementById('order-form');
-    if(!form.checkValidity()){
-        form.reportValidity();
-        return;
-    }
-    if(Object.keys(selectedMenu).length===0){
-        alert('กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการ');
-        return;
-    }
-    let roomNo=document.getElementById('roomNo').value;
-    const pax=document.getElementById('pax').value;
-    const serviceType=document.getElementById('serviceType').value;
-    let time=document.getElementById('time').value;
-    if(serviceType==='Room-service' && time<ROOM_SERVICE_START_TIME){
-        time=ROOM_SERVICE_START_TIME;
-    }
-    const hasBreakfast=Object.values(selectedMenu).some(item=>item.type==='Breakfast');
-    if(hasBreakfast && !isBreakfastTimeValid()){
-        alert(`คุณมีรายการอาหารเช้า แต่ไม่อยู่ช่วง ${BREAKFAST_START_TIME}-${BREAKFAST_END_TIME}`);
-        return;
-    }
-    const orderData={roomNo,pax,serviceType,time,selectedMenu};
-    document.getElementById('submit-order').textContent='กำลังส่ง...';
-    document.getElementById('submit-order').disabled=true;
-    try{
-        const response=await fetch(WEB_APP_URL,{
-            method:'POST',
-            headers:{'Content-Type':'text/plain;charset=utf-8'},
-            body:JSON.stringify(orderData)
+// ================== Submit ==================
+document.getElementById('submit-order').addEventListener('click', async () => {
+    const form = document.getElementById('order-form');
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (selectedMenu.length === 0) { 
+        Swal.fire({
+            icon: 'warning',
+            title: '⚠️ กรุณาเลือกเมนู',
+            text: 'กรุณาเลือกเมนูอาหารอย่างน้อย 1 รายการ',
+            confirmButtonText: 'ตกลง',
+            background: '#fff9e6',
         });
-        const result=await response.json();
-        if(result.success){
-            alert('✅ สั่งอาหารสำเร็จ!');
+        return; 
+    }
+
+    const roomNo = document.getElementById('roomNo').value;
+    const pax = document.getElementById('pax').value;
+    const serviceType = document.getElementById('serviceType').value;
+    let time = document.getElementById('time').value;
+    if (serviceType === 'Room-service' && time < ROOM_SERVICE_START_TIME) time = ROOM_SERVICE_START_TIME;
+    const note = document.getElementById('note').value;
+
+    const orderItems = Object.values(selectedMenu).map(item => `• ${item.name} x${item.qty}`).join('\n');
+
+    const orderData = {
+        roomNo,
+        pax,
+        serviceType,
+        time,
+        selectedMenu: orderItems,
+        note
+    };
+
+    document.getElementById('submit-order').textContent = 'กำลังส่ง...';
+    document.getElementById('submit-order').disabled = true;
+
+    try {
+        const res = await fetch(WEB_APP_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(orderData)
+        });
+        const result = await res.json();
+        if (result.success) {
+            Swal.fire({
+                title: '🎉 สั่งอาหารสำเร็จ!',
+                imageUrl: 'https://cdn-icons-png.flaticon.com/512/1046/1046784.png', // รูปอาหารน่ารัก
+                imageWidth: 100,
+                imageHeight: 100,
+                imageAlt: 'Food Success',
+                confirmButtonText: 'ตกลง',
+                background: '#fff9e6',
+                color: '#333',
+            });
+
             form.reset();
-            selectedMenu={};
-            document.querySelectorAll('.menu-item').forEach(d=>d.classList.remove('selected'));
+            selectedMenu = [];
+            renderMenuContent();
             updateSummary();
         } else {
-            alert('❌ เกิดข้อผิดพลาด: '+result.message);
+            Swal.fire({
+                icon: 'error',
+                title: '❌ เกิดข้อผิดพลาด',
+                text: result.message,
+                confirmButtonText: 'ตกลง',
+                background: '#fff0f0',
+            });
         }
-    } catch(err){
-        console.error(err);
-        alert('❌ เกิดข้อผิดพลาดในการเชื่อมต่อ');
-    } finally{
-        document.getElementById('submit-order').textContent='ยืนยันคำสั่งซื้อ';
-        document.getElementById('submit-order').disabled=false;
+    } catch (e) {
+        console.error(e);
+        Swal.fire({
+            icon: 'error',
+            title: '❌ เกิดข้อผิดพลาดในการเชื่อมต่อ',
+            confirmButtonText: 'ตกลง',
+            background: '#fff0f0',
+        });
+    } finally {
+        document.getElementById('submit-order').textContent = 'ยืนยันคำสั่งซื้อ';
+        document.getElementById('submit-order').disabled = false;
     }
-}
+});
+// ================== Slider ==================
+const slidesEl = document.querySelector('.slides');
+const slides = document.querySelectorAll('.slide');
+let sliderIndex = 0;
 
-// สไลด์ภาพ
-const sliderImgs=document.querySelectorAll('#slider img');
-let sliderIndex=0;
-setInterval(()=>{
-    sliderImgs.forEach(img=>img.classList.remove('active'));
-    sliderIndex=(sliderIndex+1)%sliderImgs.length;
-    sliderImgs[sliderIndex].classList.add('active');
-},3000);
+document.getElementById('next').addEventListener('click', ()=>{
+    sliderIndex = (sliderIndex + 1) % slides.length;
+    slidesEl.style.transform = `translateX(-${sliderIndex*100}%)`;
+});
+
+document.getElementById('prev').addEventListener('click', ()=>{
+    sliderIndex = (sliderIndex - 1 + slides.length) % slides.length;
+    slidesEl.style.transform = `translateX(-${sliderIndex*100}%)`;
+});
+
+
+// เริ่มต้น render
+renderMenuContent();
 </script>
 </body>
 </html>
