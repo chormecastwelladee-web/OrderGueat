@@ -42,7 +42,7 @@ body {
 
 /* ========== Title ========== */
 h1 {
-    color: #007bff;
+    color: #000000;
     margin-bottom: 40px;
     font-size: 1.8em;
     font-weight: bold;
@@ -61,14 +61,14 @@ h1 {
     border: none;
     border-radius: 12px;
     cursor: pointer;
-    background: linear-gradient(90deg, #007bff, #00b0ff);
+    background: linear-gradient(90deg, #0f541b, #5cc1f0);
     color: #fff;
     font-weight: bold;
     transition: 0.3s;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .category-btn:hover {
-    background: linear-gradient(90deg, #0056b3, #0093d1);
+    background: linear-gradient(90deg, #0056b3, #8bdcff);
     transform: translateY(-3px);
     box-shadow: 0 6px 15px rgba(0,0,0,0.2);
 }
@@ -82,8 +82,47 @@ h1 {
     <h1>เลือกหมวดหมู่เมนู</h1>
 
     <div class="category-grid">
-        <button class="category-btn" onclick="window.location.href='breakfast.html'">🍳 อาหารเช้า</button>
+       
+        
         <button class="category-btn" onclick="window.location.href='alacart.html'">🥘 อลาคาร์ท</button>
+        <button class="category-btn" onclick="checkBreakfastTime()">🍳 อาหารเช้า</button>
+
+<!-- ใส่ใน <head> -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- ปุ่มอาหารเช้า -->
+
+
+<script>
+function checkBreakfastTime() {
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+
+    const currentTime = hours * 60 + minutes; // แปลงเวลาเป็นนาที
+    const startTime = 7 * 60;   // 07:00 -> 420 นาที
+    const endTime = 12 * 60 + 30; // 10:30 -> 630 นาที
+
+    if (currentTime < startTime || currentTime > endTime) {
+        Swal.fire({
+            title: '🥪 อุ๊ปส์!',
+            text: 'ตอนนี้ยังไม่อยู่ในช่วงเวลาอาหารเช้า (07:00 - 10:30)',
+            imageUrl: 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png', // ใส่รูปน่ารัก ๆ
+            imageWidth: 100,
+            imageHeight: 100,
+            imageAlt: 'Breakfast time',
+            confirmButtonText: 'ตกลง',
+            background: '#fff9e6',
+            color: '#333',
+        });
+        return; // ไม่ไปหน้า breakfast.html
+    }
+
+    // ถ้าเวลาถูกต้อง
+    window.location.href = 'breakfast.html';
+}
+</script>
+
     </div>
 </div>
 </body>
