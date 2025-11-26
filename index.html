@@ -101,7 +101,7 @@ function checkBreakfastTime() {
 
     const currentTime = hours * 60 + minutes; // แปลงเวลาเป็นนาที
     const startTime = 7 * 60;   // 07:00 -> 420 นาที
-    const endTime = 12 * 60 + 30; // 10:30 -> 630 นาที
+    const endTime = 10 * 60 + 30; // 10:30 -> 630 นาที
 
     if (currentTime < startTime || currentTime > endTime) {
         Swal.fire({
@@ -127,3 +127,4 @@ function checkBreakfastTime() {
 </div>
 </body>
 </html>
+
